@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Compass GeoCaching</string>
+    <string name="drawer_open">Quests</string>
+    <string name="open_drawer">open menu</string>
+    <string name="close_drawer">close menu</string>
+    <string name="wrong_code">Das ist die falsche Antwort! Nochmal versuchen oder Hilfe rufen.</string>
+    <string name="wrong_code_button">Hilft ja nix.</string>
+    <string name="reset_app">reset game</string>
+
+</resources>

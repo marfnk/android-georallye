@@ -1,0 +1,46 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+	    android:id="@+id/dialog_wrapper"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    
+    <ImageView
+        android:id="@+id/dialogheaderImage"
+        android:src="@drawable/dialog_title_background"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:scaleType="fitXY"
+        android:background="#CCCCCC"
+        android:contentDescription="@string/app_name" />
+    <TextView
+        android:id="@+id/dialogheaderText"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:textSize="18pt"
+        android:text="Titel der Quest"
+        android:padding="5dp"
+        android:textAlignment="center"
+        android:layout_alignTop="@id/dialogheaderImage"
+        android:layout_alignLeft="@id/dialogheaderImage"
+        android:fontFamily="assets/fonts/GloriaHallelujah.ttf"
+        />
+    
+    <ScrollView
+	    android:id="@+id/scroller"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:scrollbars="vertical"
+	    android:layout_below="@id/dialogheaderImage"
+	    android:fillViewport="true">
+
+        <TextView
+	        android:id="@+id/message"
+	        android:padding="5dp"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:textSize="12pt"
+	        android:fontFamily="assets/fonts/GloriaHallelujah.ttf"
+	        />
+
+    </ScrollView>
+</RelativeLayout>
