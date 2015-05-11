@@ -83,11 +83,14 @@ public class QuestManager {
 
     public void silentlyActivateQuest(String code, boolean reveiled, boolean completed) {
         Quest q = activateQuest(code);
-        q.setReveiled(reveiled);
-        q.setCompleted(completed);
+        if (q != null) {
+            q.setReveiled(reveiled);
+            q.setCompleted(completed);
+        }
     }
 
     public void reset() {
+        allQuests = Quests.getQuests();
         activatedQuests.clear();
     }
 

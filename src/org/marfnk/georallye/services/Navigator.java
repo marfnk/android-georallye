@@ -26,23 +26,27 @@ public class Navigator implements LocationListener {
     }
 
     public void registerListener() {
-        locationManager.requestLocationUpdates(locationProvider, 0, 0, this);
+        locationManager.requestLocationUpdates(locationProvider, 1000, 1, this);
     }
 
     public void unregisterListener() {
         locationManager.removeUpdates(this);
     }
 
-    public void setLocation(double latitude, double longitude) {
+    public void setReferenceLocation(double latitude, double longitude) {
+        Log.i(TAG, "nav to new location: " + latitude + "; " + longitude);
+        
         Location l = new Location("CUSTOM");
         l.setLatitude(latitude);
         l.setLongitude(longitude);
         reference = l;
-        
-        onLocationChanged(lastKnownLocation);
+
+        fixGPSLocation();
+        notifyListeners();
     }
 
     public float getBearing() {
+        fixGPSLocation();
         if (lastKnownLocation != null && reference != null) {
             float bearTo = lastKnownLocation.bearingTo(reference);
             if (bearTo < 0) {
@@ -55,10 +59,14 @@ public class Navigator implements LocationListener {
     }
 
     public float getDistance() {
+        fixGPSLocation();
+        
+        Log.i(TAG, "current Location: " + lastKnownLocation + " target location: " +  reference);
+        
         if (lastKnownLocation != null && reference != null) {
             return lastKnownLocation.distanceTo(reference);
         } else {
-            return 0;
+            return 9999;
         }
     }
 
@@ -79,9 +87,8 @@ public class Navigator implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.i("TAG", "new location: " + location);
+        Log.i(TAG, "new location: " + location);
         lastKnownLocation = location;
-
         notifyListeners();
     }
 
@@ -95,8 +102,43 @@ public class Navigator implements LocationListener {
         }
     }
 
-    public void resetLocation() {
+    public void resetReference() {
         reference = null;
-        onLocationChanged(reference);
+
+        onLocationChanged(lastKnownLocation);
+    }
+
+    public void fixGPSLocation() {
+        if (lastKnownLocation == null && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Location locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Location locationNet = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+            long GPSLocationTime = 0;
+            if (null != locationGPS) {
+                GPSLocationTime = locationGPS.getTime();
+            }
+
+            long NetLocationTime = 0;
+
+            if (null != locationNet) {
+                NetLocationTime = locationNet.getTime();
+            }
+
+            if (0 < GPSLocationTime - NetLocationTime) {
+                lastKnownLocation = locationGPS;
+            } else {
+                lastKnownLocation = locationNet;
+            }
+
+            onLocationChanged(lastKnownLocation);
+        }
+    }
+
+    public float getAccuracy() {
+        if (lastKnownLocation != null) {
+            return lastKnownLocation.getAccuracy();
+        } else {
+            return 999f;
+        }
     }
 }

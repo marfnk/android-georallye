@@ -1,5 +1,6 @@
 package org.marfnk.georallye;
 
+import org.marfnk.georallye.R;
 import org.marfnk.georallye.adapter.MenuListAdapter;
 import org.marfnk.georallye.adapter.Observer;
 import org.marfnk.georallye.data.Constants;
@@ -8,18 +9,22 @@ import org.marfnk.georallye.services.GameEngine;
 import org.marfnk.georallye.services.Navigator;
 import org.marfnk.georallye.services.PersistanceManager;
 import org.marfnk.georallye.services.QuestManager;
+import org.marfnk.georallye.views.AccuracyTextView;
 import org.marfnk.georallye.views.CompassView;
 import org.marfnk.georallye.views.DistanceTextView;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.hardware.SensorManager;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,7 +50,8 @@ public class MainActivity extends Activity {
     private DistanceTextView distanceText;
     private PersistanceManager persistanceManager;
     private MenuListAdapter menuListAdapter;
-    
+    private AccuracyTextView accuracyText;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,16 +64,41 @@ public class MainActivity extends Activity {
         codeInput = (EditText) findViewById(R.id.codeInput);
         compassView = (CompassView) findViewById(R.id.compassView);
         distanceText = (DistanceTextView) findViewById(R.id.distanceText);
+        accuracyText = (AccuracyTextView) findViewById(R.id.accuracyText);
 
+        if (!gpsEnabled()) {
+            // GPS OFF
+            askToEnableGPS();
+        }
+        
         initializeCodeInput();
         intializeServices();
         initializeDrawer();
-        
+
         compassView.setNavigator(myNavigator);
         compassView.setCompass(myCompass);
         distanceText.setNavigator(myNavigator);
-        
+        accuracyText.setNavigator(myNavigator);
+
         persistanceManager.restoreGameState();
+    }
+
+    private void askToEnableGPS() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Your GPS seems to be disabled, please enable it!").setCancelable(false)
+                .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog,
+                            @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private boolean gpsEnabled() {
+        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        return manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
     private void intializeServices() {
@@ -151,10 +182,10 @@ public class MainActivity extends Activity {
     protected void onPause() {
         myCompass.unregisterListener();
         myNavigator.unregisterListener();
-        
-        //Saves the state of the game
+
+        // Saves the state of the game
         persistanceManager.saveGameState();
-        
+
         super.onPause();
     }
 
@@ -170,13 +201,12 @@ public class MainActivity extends Activity {
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -184,7 +214,7 @@ public class MainActivity extends Activity {
             gameEngine.resetGame();
             menuListAdapter.notifyDataSetChanged();
         }
-        
+
         if (id == android.R.id.home) {
             if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
                 mDrawerLayout.closeDrawer(mDrawerList);

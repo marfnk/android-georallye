@@ -38,7 +38,7 @@
 	        android:padding="5dp"
 	        android:layout_width="match_parent"
 	        android:layout_height="match_parent"
-	        android:textSize="12pt"
+	        android:textSize="10pt"
 	        android:fontFamily="assets/fonts/GloriaHallelujah.ttf"
 	        />
 

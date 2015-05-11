@@ -39,15 +39,6 @@
                 android:text="OK" />
         </LinearLayout>
 
-        <org.marfnk.georallye.views.DistanceTextView
-            android:id="@+id/distanceText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:text="Distance: n/a"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
         <org.marfnk.georallye.views.CompassView 
             android:id="@+id/compassView"
             android:layout_width="wrap_content"
@@ -55,6 +46,37 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             />
+        
+        
+        <LinearLayout 
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            >
+            
+            <org.marfnk.georallye.views.DistanceTextView
+	            android:id="@+id/distanceText"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_centerHorizontal="true"
+	        	android:layout_alignTop="@+id/accuracyText"
+	            android:text="Distance: n/a"
+	            android:textAppearance="?android:attr/textAppearanceLarge" />
+        
+	        <org.marfnk.georallye.views.AccuracyTextView
+	            android:id="@id/accuracyText"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_centerHorizontal="true"
+	            android:text="Accurracy: n/a"
+		        android:textSize="8pt"
+	            android:textAppearance="?android:attr/textAppearanceLarge" />
+            
+        </LinearLayout>
+        
+        
     </RelativeLayout>
     
     <!-- The navigation drawer -->

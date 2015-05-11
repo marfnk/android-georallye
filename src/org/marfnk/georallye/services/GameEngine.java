@@ -48,7 +48,7 @@ public class GameEngine {
     public void processCode(String code) {
         final String cleanCode = code.trim().toLowerCase(Constants.LOCALE);
 
-        if (questManager.hasOpenQuest(code)) {
+        if (questManager.hasOpenQuest(cleanCode)) {
             updateCurrentQuest();
 
             final Runnable activateNewQuest = new Runnable() {
@@ -59,7 +59,7 @@ public class GameEngine {
                     updateCurrentQuest();
                     
                     //navigate to new location
-                    navigator.setLocation(currentQuest.getLatitude(), currentQuest.getLongitude());
+                    navigator.setReferenceLocation(currentQuest.getLatitude(), currentQuest.getLongitude());
                     
                     // show welcome message
                     showInfoForQuest(currentQuest, "Auf geht's...");
@@ -98,13 +98,14 @@ public class GameEngine {
     public void showInfoForQuest(Quest q, String buttonText) {
         if (q != null) {
             if (q.isCompleted()) {
+                //show all
                 Dialogs.showCompleteMessageDialog(activity, q.getTitle(), buttonText, null,
                         q.getWelcomeMessage(), q.getQuestMessage(), q.getCompleteMessage());
             } else {
                 //not completed
                 if (q.isReveiled()) {
                     Dialogs.showCompleteMessageDialog(activity, q.getTitle(), buttonText, null,
-                            currentQuest.getWelcomeMessage(), q.getQuestMessage());
+                            q.getQuestMessage());
                 } else {
                     Dialogs.showCompleteMessageDialog(activity, q.getTitle(), buttonText, null,
                             currentQuest.getWelcomeMessage());
@@ -140,9 +141,12 @@ public class GameEngine {
             }
         }
         
-        editor.putString(STATE_COMPLETED_QUESTS, TextUtils.join(";", completedQuests)); //n items, joined by ";"
+        String joined = TextUtils.join(";", completedQuests);
+        editor.putString(STATE_COMPLETED_QUESTS, joined); //n items, joined by ";"
         editor.putString(STATE_REVEILED_QUEST, reveiledQuestCode); //max 1
         editor.putString(STATE_OPEN_QUEST, openQuestCode); //max 1
+        
+        Log.e(TAG, "SAVE! Completed: " + joined + " && reveiled: " + reveiledQuestCode + " && open: " + openQuestCode);
     }
     
     public void restoreGameState(SharedPreferences sharedPref) {
@@ -163,17 +167,19 @@ public class GameEngine {
             if (openQuest != null) {
                 questManager.silentlyActivateQuest(openQuest, false, false);
             }
+            Log.i(TAG, "RESTORE! completed: " + completedQuests + " && reveiled: " + reveiledQuest + " && open: " + openQuest);
         }
+        
         //restart navigation
         updateCurrentQuest();
         if (currentQuest != null) {
-            navigator.setLocation(currentQuest.getLatitude(), currentQuest.getLongitude());
+            navigator.setReferenceLocation(currentQuest.getLatitude(), currentQuest.getLongitude());
         }
     }
     
     public void resetGame() {
         questManager.reset();
         currentQuest = null;
-        navigator.resetLocation();
+        navigator.resetReference();
     }
 }

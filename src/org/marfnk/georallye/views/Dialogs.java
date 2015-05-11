@@ -31,46 +31,51 @@ public class Dialogs {
 
     public static void showCompleteMessageDialog(Activity activity, String title, String buttonText, final Runnable next,
             String... messages) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        
-        LayoutInflater inflater = activity.getLayoutInflater();
-        View view = inflater.inflate(R.layout.quest_dialog, null);
-        
-        builder.setView(view).setPositiveButton(buttonText, new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (next != null) {
-                    next.run();
+        if (messages == null || (messages.length == 1 && messages[0] == null)) {
+            //nothing to show!
+            return;
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            
+            LayoutInflater inflater = activity.getLayoutInflater();
+            View view = inflater.inflate(R.layout.quest_dialog, null);
+            
+            builder.setView(view).setPositiveButton(buttonText, new OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (next != null) {
+                        next.run();
+                    }
                 }
+            });
+    
+            String message = "";
+            for (int i = 1; i <= messages.length; i++) {
+                message += messages[i - 1] + "\n\n";
             }
-        });
-
-        String message = "";
-        for (int i = 1; i <= messages.length; i++) {
-            message += messages[i - 1] + "\n\n";
+            
+            TextView tv = (TextView) view.findViewById(R.id.message);
+            tv.setText(message);
+            
+            tv.setTypeface(Constants.TEXT_TYPEFACE);
+            
+            final ScrollView scrollWrapper = (ScrollView) view.findViewById(R.id.scroller);
+            scrollWrapper.post(new Runnable() {
+                @Override
+                public void run() {
+                    scrollWrapper.fullScroll(View.FOCUS_DOWN);
+                }
+            });
+            
+            TextView titleText = (TextView) view.findViewById(R.id.dialogheaderText);
+            titleText.setText(title);
+            titleText.setTypeface(Constants.TEXT_TYPEFACE);
+            
+            AlertDialog dialog = builder.create();
+            
+            builder.setCancelable(false);
+            
+            dialog.show();
         }
-        
-        TextView tv = (TextView) view.findViewById(R.id.message);
-        tv.setText(message);
-        
-        tv.setTypeface(Constants.TEXT_TYPEFACE);
-        
-        final ScrollView scrollWrapper = (ScrollView) view.findViewById(R.id.scroller);
-        scrollWrapper.post(new Runnable() {
-            @Override
-            public void run() {
-                scrollWrapper.fullScroll(View.FOCUS_DOWN);
-            }
-        });
-        
-        TextView titleText = (TextView) view.findViewById(R.id.dialogheaderText);
-        titleText.setText(title);
-        titleText.setTypeface(Constants.TEXT_TYPEFACE);
-        
-        AlertDialog dialog = builder.create();
-        
-        builder.setCancelable(false);
-        
-        dialog.show();
     }
 }
